@@ -8,7 +8,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 #### Préparation des données ####
 
 # Charge dataset 
-dataset = pd.read_csv('votre_fichier.csv')
+dataset = pd.read_csv('fichier.csv')
 
 # Visualisation (comme tu as fait avec les couleurs ???)
 ##A RAJOUTER##
