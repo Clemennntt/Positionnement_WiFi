@@ -1,5 +1,6 @@
 #! /usr/bin/python3
 import pandas as pd
+import numpy as np
 from scipy.stats import chi2_contingency
 from sklearn.preprocessing import OneHotEncoder
 import sys

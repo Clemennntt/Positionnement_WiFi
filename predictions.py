@@ -8,6 +8,11 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from traitement_data import convert_same_SA, filtrage_colonne_for_ML, correlation_Pearson, correlation_Spearman, khi2, codage_one_hot_for_ML
 from scipy.stats import chi2_contingency
 
+import warnings
+# Ignorer les avertissements
+warnings.filterwarnings("ignore")
+
+
 def test_correlation(data) :
     """ 
     On fait les différents tests
@@ -25,7 +30,6 @@ def KNN(data_train, data_test) :
     # Split the data
     X_train = data_train[['SA', 'RSSI']]
     y_train = data_train[['x', 'y', 'z']]
-
     X_test = data_test[['SA', 'RSSI']]
     y_test = data_test[['x', 'y', 'z']]
 
@@ -33,30 +37,37 @@ def KNN(data_train, data_test) :
 
     # Codage one-hot des variables SA
     X_train = codage_one_hot_for_ML(X_train)
-    y_test = codage_one_hot_for_ML(X_test)
+    X_test = codage_one_hot_for_ML(X_test)
 
-    # #### Modèle et prédiction ####
+    #### Modèle et prédiction ####
 
-    # # KNN model & prédiction
-    # knn = KNeighborsRegressor(n_neighbors=3)
-    # knn.fit(X_train, y_train)
-    # y_pred = knn.predict(X_test)
+    # KNN model & prédiction
+    knn = KNeighborsRegressor(n_neighbors=3)
+    knn.fit(X_train, y_train)
+    y_pred = knn.predict(X_test)
 
-    # #### Evaluation ####
+    #### Evaluation ####
 
-    # # Métriques d'éval (cf TP1)
-    # mae = mean_absolute_error(y_test, y_pred)
-    # rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-    # r2 = r2_score(y_test, y_pred)
+    # Métriques d'éval (cf TP1)
+    mae = mean_absolute_error(y_test, y_pred)
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    r2 = r2_score(y_test, y_pred)
 
-    # print("Mean Absolute Error (MAE):", mae)
-    # print("Root Mean Square Error (RMSE):", rmse)
-    # print("R² Score:", r2)
+    print("Mean Absolute Error (MAE):", mae)
+    print("Root Mean Square Error (RMSE):", rmse)
+    print("R² Score:", r2)
 
+    # Affichage des prédictions
+    predictions = pd.DataFrame({'DB_mean_recu': X_test['RSSI'].values,
+                                'x_predi': y_pred[:, 0],
+                                'y_predi': y_pred[:, 1],
+                                'z_predi': y_pred[:, 2],
+                                'x_vrai': y_test['x'].values,
+                                'y_vrai': y_test['y'].values,
+                                'z_vrai': y_test['z'].values})
 
-    # # Affichage des prédictions
-    # predictions = pd.DataFrame({'Position_x': X_test['position_x'], 'Position_y': X_test['position_y'], 'Adresse_MAC': X_test['adresse_mac'], 'DB_mean_prédit': y_pred})
-    # print(predictions)
+    print('Voici le tableau avec les prédictions :')                            
+    print(predictions.head(10))
 
 
 #========================================================================================================================================#
