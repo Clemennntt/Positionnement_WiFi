@@ -52,7 +52,7 @@ def pivot_dataset(df):
     copy = df.copy()
     copy['SA'] = copy['SA'].apply(_mac_to_int)
 
-    pivoted = pd.pivot_table(copy, values='RSSI', index=['x', 'y'], columns=['SA'], fill_value=-99).reset_index()
+    pivoted = pd.pivot_table(copy, values='RSSI', index=['x', 'y'], columns=['SA'], fill_value=-99, aggfunc=np.mean).reset_index()
 
     return pivoted
 

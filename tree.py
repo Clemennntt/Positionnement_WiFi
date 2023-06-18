@@ -8,6 +8,7 @@ from sklearn import tree
 from traitement_data import prepare_data, pivot_dataset, _extract_clean_dataset, convert_same_SA
 
 def train_model(df_train):
+
     df_train_pivoted = pivot_dataset(df_train)
 
     X = df_train_pivoted.drop(['x', 'y'], axis=1).to_numpy()
@@ -50,16 +51,13 @@ def main(argc, argv):
 
     df_train_cleaned, df_test_cleaned = prepare_data(argv[1], argv[2])
 
-    # load datasets and clean data if needed (A manual deletion of non UTF-8 char should be done manually since pandas doesn't seems to find them)
-    df_train = _extract_clean_dataset(argv[1])
-    df_test = _extract_clean_dataset(argv[2])
-
+    #df_train = _extract_clean_dataset(argv[1])
+    #df_test = _extract_clean_dataset(argv[2])
     #df_train_cleaned, df_test_cleaned = convert_same_SA(df_train, df_test)
-    
+  
     clf = train_model(df_train_cleaned)
     
     test_model(clf, df_test_cleaned)
-
 
 
     df_test_pivoted = pivot_dataset(df_test_cleaned)
