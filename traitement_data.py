@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from scipy.stats import chi2_contingency
 from sklearn.preprocessing import OneHotEncoder
 
@@ -92,11 +93,19 @@ def codage_one_hot_for_ML(data) :
     print('--------------------')
     print("Nombre de SA différentes dans le dataset :", nombre_sa_differentes)
 
-    # Ajout des données en one hot avec concatenate
-    encoded_SA = encoder.fit_transform(data[['SA']]).toarray()
+    # Ajout des données en one hot 
+    encoder.fit(data[['SA']])
+    encoded_SA = encoder.transform(data[['SA']]).toarray()
+
+    # Réinitialisation des index des DataFrames
+    data = data.reset_index(drop=True)
+    encoded_SA_df = pd.DataFrame(encoded_SA)
+
+    # Ajout avec concatenate
     data = pd.concat([data, pd.DataFrame(encoded_SA)], axis=1)
-    
-    # Affichage du new dataset
-    print(data.head(3))
+
+    # drop colonne SA + Nan et affichage
+    data = data.drop('SA', axis=1)
+    data = data.dropna()
 
     return data
