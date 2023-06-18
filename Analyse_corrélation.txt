@@ -1,0 +1,23 @@
+Pour le test du khi-deux (chi-square), une faible valeur 
+de p (p-value) indique une corrélation significative 
+entre les variables. 
+
+En général, un seuil couramment utilisé pour la 
+signification statistique est une 
+p-valeur inférieure à 0,05. 
+
+En ce qui concerne les coefficients de corrélation 
+de Pearson et de Spearmanune valeur proche de 1 ou -1 
+indique une forte corrélation entre les variables. 
+
+Pour la corrélation de Pearson, 
+un coefficient proche de 1 indique une corrélation linéaire 
+positive forte tandis qu'un coefficient proche de -1 
+indique une corrélation linéaire négative forte. 
+Un coefficient proche de 0 indique une faible 
+corrélation linéaire entre les variables.
+
+Pour la corrélation de Spearman, un coefficient
+proche de 1 ou -1 indique une corrélation monotone forte 
+Un coefficient proche de 0 indique une faible corrélation 
+monotone entre les variables.
