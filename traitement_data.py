@@ -1,5 +1,6 @@
 import pandas as pd
 from scipy.stats import chi2_contingency
+from sklearn.preprocessing import OneHotEncoder
 
 def convert_same_SA(data1, data2) :
     """
@@ -79,3 +80,23 @@ def khi2(data) :
     #         print(tableau_contingence)
     #         print("p-value :", p_value)
     #         print("")
+
+def codage_one_hot_for_ML(data) :
+    """
+    Permet de coder les SA en one hot vu que c'est pas des valeurs numérique
+    """
+    encoder = OneHotEncoder()
+
+    # Calcul du nbr de SA diff
+    nombre_sa_differentes = data['SA'].nunique()
+    print('--------------------')
+    print("Nombre de SA différentes dans le dataset :", nombre_sa_differentes)
+
+    # Ajout des données en one hot avec concatenate
+    encoded_SA = encoder.fit_transform(data[['SA']]).toarray()
+    data = pd.concat([data, pd.DataFrame(encoded_SA)], axis=1)
+    
+    # Affichage du new dataset
+    print(data.head(3))
+
+    return data

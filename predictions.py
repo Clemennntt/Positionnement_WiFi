@@ -3,8 +3,9 @@ import numpy as np
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from traitement_data import convert_same_SA, filtrage_colonne_for_ML, correlation_Pearson, correlation_Spearman, khi2
+from traitement_data import convert_same_SA, filtrage_colonne_for_ML, correlation_Pearson, correlation_Spearman, khi2, codage_one_hot_for_ML
 from scipy.stats import chi2_contingency
 
 def test_correlation(data) :
@@ -19,18 +20,20 @@ def KNN(data_train, data_test) :
     """
     Programme KNN
     """
+    #### Prepare the data ####
 
-    # # Split the data
-    # X = data_train[['position_x', 'position_y', 'adresse_mac']]
-    # y = data_train['DB_mean']
+    # Split the data
+    X_train = data_train[['SA', 'RSSI']]
+    y_train = data_train[['x', 'y', 'z']]
 
-    # # Sélection des colonnes à normaliser et normalisation
-    # columns_to_normalize = ['position_x', 'position_y']
-    # scaler = StandardScaler()
-    # X[columns_to_normalize] = scaler.fit_transform(X[columns_to_normalize])
+    X_test = data_test[['SA', 'RSSI']]
+    y_test = data_test[['x', 'y', 'z']]
 
-    # # Split en test et train
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    print(X_train.head(3))
+
+    # Codage one-hot des variables SA
+    X_train = codage_one_hot_for_ML(X_train)
+    y_test = codage_one_hot_for_ML(X_test)
 
     # #### Modèle et prédiction ####
 
@@ -51,7 +54,7 @@ def KNN(data_train, data_test) :
     # print("R² Score:", r2)
 
 
-    # # Affichaged es prédictions
+    # # Affichage des prédictions
     # predictions = pd.DataFrame({'Position_x': X_test['position_x'], 'Position_y': X_test['position_y'], 'Adresse_MAC': X_test['adresse_mac'], 'DB_mean_prédit': y_pred})
     # print(predictions)
 
