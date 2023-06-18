@@ -175,9 +175,6 @@ def khi2(data) :
     #         print("")
 
 
-
-
-
 def main(argc, argv):
     """
     Fonction si le fichier et run directement. Si aucun params ne sont passés, des fichiers par défaut sont chargés
