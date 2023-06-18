@@ -13,34 +13,6 @@ def _mac_to_int(mac_address):
     hex_string = ''.join(hex_parts)
     return int(hex_string, 16)
 
-def codage_one_hot_for_ML(data) :
-    """
-    Permet de coder les SA en one hot vu que c'est pas des valeurs numérique
-    """
-    encoder = OneHotEncoder()
-
-    # Calcul du nbr de SA diff
-    nombre_sa_differentes = data['SA'].nunique()
-    print('--------------------')
-    print("Nombre de SA différentes dans le dataset :", nombre_sa_differentes)
-
-    # Ajout des données en one hot 
-    encoder.fit(data[['SA']])
-    encoded_SA = encoder.transform(data[['SA']]).toarray()
-
-    # Réinitialisation des index des DataFrames
-    data = data.reset_index(drop=True)
-    encoded_SA_df = pd.DataFrame(encoded_SA)
-
-    # Ajout avec concatenate
-    data = pd.concat([data, pd.DataFrame(encoded_SA)], axis=1)
-
-    # drop colonne SA + Nan et affichage
-    data = data.drop('SA', axis=1)
-    data = data.dropna()
-
-    return data
-
 def _extract_clean_dataset(filename):
     """
     Charge un fichier et le nettoie. (sauf les non utf8 genre les emoji ça faut le faire à la main avec libre calc psk jsp pk ça marche pô)
@@ -163,18 +135,35 @@ def khi2(data) :
         print("p-value :", p_value)
         print("")
 
-    # Ancien test entre SA et x, y, z, RSSI mais faible corrélation et PAS PERTINENT
-    # for colonne in data.columns:
-    #     if colonne != 'SA':
-    #         tableau_contingence = pd.crosstab(data['SA'], data[colonne])
-    #         chi2, p_value, dof, expected = chi2_contingency(tableau_contingence)
-    #         print(f"Test khi2 entre SA et '{colonne}':")
-    #         print("Tableau de contingence :")
-    #         print(tableau_contingence)
-    #         print("p-value :", p_value)
-    #         print("")
+def codage_one_hot_for_ML(data) :
+    """
+    Permet de coder les SA en one hot vu que c'est pas des valeurs numérique
+    """
+    encoder = OneHotEncoder()
 
+    # Calcul du nbr de SA diff
+    nombre_sa_differentes = data['SA'].nunique()
+    print('--------------------')
+    print("Nombre de SA différentes dans le dataset :", nombre_sa_differentes)
 
+    # Ajout des données en one hot 
+    encoder.fit(data[['SA']])
+    encoded_SA = encoder.transform(data[['SA']]).toarray()
+
+    # Réinitialisation des index des DataFrames
+    data = data.reset_index(drop=True)
+    encoded_SA_df = pd.DataFrame(encoded_SA)
+
+    # Ajout avec concatenate
+    data = pd.concat([data, pd.DataFrame(encoded_SA)], axis=1)
+
+    # drop colonne SA + Nan et affichage
+    data = data.drop('SA', axis=1)
+    data = data.dropna()
+
+    return data
+
+    
 def main(argc, argv):
     """
     Fonction si le fichier et run directement. Si aucun params ne sont passés, des fichiers par défaut sont chargés
