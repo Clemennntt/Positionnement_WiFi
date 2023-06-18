@@ -7,6 +7,8 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from traitement_data import convert_same_SA, filtrage_colonne_for_ML, correlation_Pearson, correlation_Spearman, khi2, codage_one_hot_for_ML
 from scipy.stats import chi2_contingency
+from matplotlib import pyplot as plt
+import seaborn as sns
 
 import warnings
 # Ignorer les avertissements
@@ -48,7 +50,7 @@ def KNN(data_train, data_test) :
 
     #### Evaluation ####
 
-    # Métriques d'éval (cf TP1)
+    # Métriques d'éval
     mae = mean_absolute_error(y_test, y_pred)
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     r2 = r2_score(y_test, y_pred)
@@ -57,7 +59,8 @@ def KNN(data_train, data_test) :
     print("Root Mean Square Error (RMSE):", rmse)
     print("R² Score:", r2)
 
-    # Affichage des prédictions
+    #### Affichage des prédictions ####
+
     predictions = pd.DataFrame({'DB_mean_recu': X_test['RSSI'].values,
                                 'x_predi': y_pred[:, 0],
                                 'y_predi': y_pred[:, 1],
@@ -68,6 +71,51 @@ def KNN(data_train, data_test) :
 
     print('Voici le tableau avec les prédictions :')                            
     print(predictions.head(10))
+
+    #### Graphes ####
+
+    residus = y_test - y_pred
+
+    #---- 1.Diagramme de dispersion des résidus ----#
+
+    # Conversion de y_pred en DataFrame
+    y_pred_df = pd.DataFrame(y_pred, columns=['x', 'y', 'z'])
+    residus_x = residus['x']
+    residus_y = residus['y']
+    residus_z = residus['z']
+    plt.scatter(y_pred_df['x'], residus_x, color='red', label='x')
+    plt.scatter(y_pred_df['y'], residus_y, color='green', label='y')
+    plt.scatter(y_pred_df['z'], residus_z, color='blue', label='z')
+
+    plt.axhline(y=0, color='r', linestyle='-')
+    plt.xlabel('Prédictions')
+    plt.ylabel('Résidus')
+    plt.title('Diagramme de dispersion des résidus par dimension')
+    plt.legend()
+    plt.show()
+
+    #---- 2.Distribution des résidus ----#
+    
+    sns.histplot(residus, kde=True)
+    plt.xlabel('Résidus')
+    plt.ylabel('Fréquence')
+    plt.title('Distribution des résidus')
+    plt.show()
+
+    #---- 3.Conversion des résidus en une seule dimension ----#
+
+    residus_sans_z = residus.drop('z', axis = 1)
+    residus_sans_z_flatten = residus_sans_z.values.flatten()
+    # Distribution des résidus sans la variable z
+    sns.histplot(residus_sans_z_flatten, kde=True)
+    plt.xlabel('Résidus')
+    plt.ylabel('Fréquence')
+    plt.title('Distribution des résidus (sans la variable z)')
+    plt.show()
+
+    
+
+
 
 
 #========================================================================================================================================#
