@@ -58,7 +58,7 @@ def pivot_dataset(df):
 
 def prepare_data(train_set_path, test_set_path):
     """
-    Réalisé toute les opération de netoyage et de tri. Les datasets peuvent alors être utilisés
+    Réalisé toute les opération de nettoyage et de tri. Les datasets peuvent alors être utilisés
     """
     # load datasets and clean data if needed (A manual deletion of non UTF-8 char should be done manually since pandas doesn't seems to find them)
     df_train = _extract_clean_dataset(train_set_path)
@@ -168,8 +168,8 @@ def main(argc, argv):
     """
     Fonction si le fichier et run directement. Si aucun params ne sont passés, des fichiers par défaut sont chargés
     """
-    train_set_path = 'salle_P0_16_06_A3_ready_to_use.csv'
-    test_set_path = 'salle_P0_16_06_B3_ready_to_use.csv'
+    train_set_path = 'data/salle_P0_16_06_B2_filtered.csv'
+    test_set_path = 'data/salle_P0_16_06_A2_filtered.csv'
     if argc >= 3:
         train_set_path = argv[1]
         test_set_path = argv[2]
@@ -177,14 +177,14 @@ def main(argc, argv):
     # perform data reduction
     df_train_converted, df_test_converted = prepare_data(train_set_path, test_set_path)
 
-    #df_train_converted.to_csv(path_or_buf="train_set.csv",index=False)
-    #df_test_converted.to_csv(path_or_buf="test_set.csv",index=False)
+    #df_train_converted.to_csv(path_or_buf="train_set_ready_to_use.csv",index=False)
+    #df_test_converted.to_csv(path_or_buf="test_set_ready_to_use.csv",index=False)
 
     df_train_pivoted = pivot_dataset(df_train_converted)
     df_test_pivoted = pivot_dataset(df_test_converted)
 
-    df_train_pivoted.to_csv(path_or_buf="train_set_pivoted.csv",index=False)
-    df_test_pivoted.to_csv(path_or_buf="test_set_pivoted.csv",index=False)
+    #df_train_pivoted.to_csv(path_or_buf="train_set_pivoted.csv",index=False)
+    #df_test_pivoted.to_csv(path_or_buf="test_set_pivoted.csv",index=False)
 
 if __name__ == "__main__":
     """
