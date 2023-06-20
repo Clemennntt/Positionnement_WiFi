@@ -111,10 +111,14 @@ def main(argc, argv):
     
     # do this to extract only one line (only one fingerprint to evaluate)
     df_test_pivoted = pivot_dataset(df_test_cleaned)
-    Fingerprint_to_test = df_test_pivoted.drop(['x', 'y'], axis=1).to_numpy()[12]
+    Fingerprint_to_test0 = df_test_pivoted.drop(['x', 'y'], axis=1).to_numpy()[12]
+    Fingerprint_to_test1 = df_test_pivoted.drop(['x', 'y'], axis=1).to_numpy()[13]
+    Fingerprint_to_test2 = df_test_pivoted.drop(['x', 'y'], axis=1).to_numpy()[14]
     
-    pred = estimate_position(clf2, [Fingerprint_to_test])
+    pred = estimate_position(clf2, [Fingerprint_to_test0]) # juste une pred
     print(pred)
+    preds = estimate_position(clf2, [Fingerprint_to_test0, Fingerprint_to_test1, Fingerprint_to_test2]) # plusieurs preds
+    print(preds)
 
 
 if __name__ == "__main__":
