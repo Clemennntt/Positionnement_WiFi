@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from traitement_data import prepare_data, convert_same_SA, filtrage_colonne_for_ML, correlation_Pearson, correlation_Spearman, khi2, codage_one_hot_for_ML
+from traitement_data import prepare_data, pivot_dataset, convert_same_SA, filtrage_colonne_for_ML, correlation_Pearson, correlation_Spearman, khi2, codage_one_hot_for_ML
 from scipy.stats import chi2_contingency
 from matplotlib import pyplot as plt
 import seaborn as sns
@@ -28,18 +28,20 @@ def test_correlation(data) :
 
 def __prepare_data(data_train, data_test):
     #### Prepare the data ####
+    df_train_pivoted = pivot_dataset(data_train)
+    df_test_pivoted = pivot_dataset(data_test)
 
     # Split the data
-    X_train = data_train[['SA', 'RSSI']]
-    y_train = data_train[['x', 'y', 'z']]
-    X_test = data_test[['SA', 'RSSI']]
-    y_test = data_test[['x', 'y', 'z']]
+    X_train = df_train_pivoted.drop(['x', 'y'], axis=1).to_numpy()
+    y_train = df_train_pivoted[['x', 'y']].to_numpy()
 
-    print(X_train.head(3))
+    X_test = df_test_pivoted.drop(['x', 'y'], axis=1).to_numpy()
+    y_test = df_test_pivoted[['x', 'y']].to_numpy()
+
 
     # Codage one-hot des variables SA
-    X_train = codage_one_hot_for_ML(X_train)
-    X_test = codage_one_hot_for_ML(X_test)
+    #X_train = codage_one_hot_for_ML(X_train)
+    #X_test = codage_one_hot_for_ML(X_test)
     return X_train, y_train, X_test, y_test
 
 def __create_and_train_model(X_train, y_train):
@@ -67,6 +69,8 @@ def __evaluate_model(knn, X_test, y_test):
     print("Root Mean Square Error (RMSE):", rmse)
     print("R² Score:", r2)
 
+    return
+    # après ça bug
     #### Affichage des prédictions ####
 
     predictions = pd.DataFrame({'DB_mean_recu': X_test['RSSI'].values,
@@ -157,6 +161,7 @@ def main(argc, argv):
     
     #### Préparation des données ####
     data_train, data_test = prepare_data(train_set_path, test_set_path)
+
     X_train, y_train, X_test, y_test = __prepare_data(data_train, data_test)
 
 
@@ -170,7 +175,7 @@ def main(argc, argv):
 
 
     #### KNN training #### 
-    """knn = __create_and_train_model(X_train.to_numpy(), y_train.to_numpy())
+    """knn = __create_and_train_model(X_train, y_train)
     __evaluate_model(knn, X_test, y_test)
     __save_model(knn, 'model/KNN_model.pkl')"""
 
@@ -178,9 +183,11 @@ def main(argc, argv):
     #### example ####
     knn = load_model('model/KNN_model.pkl')
 
-    Fingerprint_to_test0 = X_test.to_numpy()[12]
-    Fingerprint_to_test1 = X_test.to_numpy()[13]
-    Fingerprint_to_test2 = X_test.to_numpy()[14]
+    Fingerprint_to_test0 = X_test[12]
+    Fingerprint_to_test1 = X_test[13]
+    Fingerprint_to_test2 = X_test[14]
+    
+    print(Fingerprint_to_test0)
 
     pred = estimate_position(knn, [Fingerprint_to_test0])
     print(pred)
