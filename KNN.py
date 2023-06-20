@@ -5,10 +5,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from traitement_data import convert_same_SA, filtrage_colonne_for_ML, correlation_Pearson, correlation_Spearman, khi2, codage_one_hot_for_ML
+from traitement_data import prepare_data, convert_same_SA, filtrage_colonne_for_ML, correlation_Pearson, correlation_Spearman, khi2, codage_one_hot_for_ML
 from scipy.stats import chi2_contingency
 from matplotlib import pyplot as plt
 import seaborn as sns
+import sys
+import pickle
+
 
 import warnings
 # Ignorer les avertissements
@@ -19,14 +22,11 @@ def test_correlation(data) :
     """ 
     On fait les différents tests
     """
-    correlation_Pearson(data_train)
-    correlation_Spearman(data_train)
-    khi2(data_train)
+    correlation_Pearson(data)
+    correlation_Spearman(data)
+    khi2(data)
 
-def KNN(data_train, data_test) :
-    """
-    Programme KNN
-    """
+def __prepare_data(data_train, data_test):
     #### Prepare the data ####
 
     # Split the data
@@ -40,15 +40,23 @@ def KNN(data_train, data_test) :
     # Codage one-hot des variables SA
     X_train = codage_one_hot_for_ML(X_train)
     X_test = codage_one_hot_for_ML(X_test)
+    return X_train, y_train, X_test, y_test
 
+def __create_and_train_model(X_train, y_train):
     #### Modèle et prédiction ####
 
     # KNN model & prédiction
     knn = KNeighborsRegressor(n_neighbors=3)
     knn.fit(X_train, y_train)
-    y_pred = knn.predict(X_test)
+    return knn
 
+def estimate_position(knn, X_test):
+    y_pred = knn.predict(X_test)
+    return y_pred
+
+def __evaluate_model(knn, X_test, y_test):
     #### Evaluation ####
+    y_pred = estimate_position(knn, X_test)
 
     # Métriques d'éval
     mae = mean_absolute_error(y_test, y_pred)
@@ -113,8 +121,21 @@ def KNN(data_train, data_test) :
     plt.title('Distribution des résidus (sans la variable z)')
     plt.show()
 
-    
+def __save_model(knn, path):
+    """
+    Private methode 
+    Save the trained model to file
+    """
+    with open(path, 'xb') as f:
+        pickle.dump(knn, f)
 
+def load_model(path):
+    """
+    Load the tree model from source
+    """
+    with open(path, 'rb') as f:
+        knn = pickle.load(f)
+    return knn
 
 
 
@@ -122,29 +143,52 @@ def KNN(data_train, data_test) :
 #================================================================= Main =================================================================#
 #========================================================================================================================================#
 
-if __name__ == "__main__":
+
+def main(argc, argv):
+    """
+    Fonction si le fichier et run directement. Si aucun params ne sont passés, des fichiers par défaut sont chargés
+    """
+    train_set_path = 'salle_P0_16_06_B2_filtered.csv'
+    test_set_path = 'salle_P0_16_06_A2_filtered.csv'
+    if argc >= 3:
+        train_set_path = argv[1]
+        test_set_path = argv[2]
+
     
     #### Préparation des données ####
+    data_train, data_test = prepare_data(train_set_path, test_set_path)
+    X_train, y_train, X_test, y_test = __prepare_data(data_train, data_test)
 
-    # Import les données
-    data_test = pd.read_csv('salle_P0_16_06_A3_ready_to_use.csv')
-    data_train = pd.read_csv('salle_P0_16_06_B3_ready_to_use.csv')
 
-    # Filtrage des datas 
-    data_train, data_test = convert_same_SA(data_train, data_test)
-
-    ## A PARTIR D'ICI DATA_TRAIN et DATA_TEST SONT LES BASES POUR LES 3 PROGRAMMES (MLx + DL) ##
-
-    #### Programme Machine Learning ####
-    #### Filtrage pour ML ####
-
-    # On garde les colonnes essentiels : SA, COUNT, x, y, z
+    #### Evaluation ? ####
+    """# On garde les colonnes essentiels : SA, COUNT, x, y, z
     data_train_ML = filtrage_colonne_for_ML(data_train)
     data_test_ML = filtrage_colonne_for_ML(data_test)
 
     # Tests de corrélation
-    test_correlation(data_train_ML)
+    test_correlation(data_train_ML)"""
 
-    #### Programme 1 : KNN #### 
 
-    KNN(data_train_ML, data_test_ML)
+    #### KNN training #### 
+    """knn = __create_and_train_model(X_train.to_numpy(), y_train.to_numpy())
+    __evaluate_model(knn, X_test, y_test)
+    __save_model(knn, 'model/KNN_model.pkl')"""
+
+
+    #### example ####
+    knn = load_model('model/KNN_model.pkl')
+
+    Fingerprint_to_test0 = X_test.to_numpy()[12]
+    Fingerprint_to_test1 = X_test.to_numpy()[13]
+    Fingerprint_to_test2 = X_test.to_numpy()[14]
+
+    pred = estimate_position(knn, [Fingerprint_to_test0])
+    print(pred)
+
+    preds = estimate_position(knn, [Fingerprint_to_test0, Fingerprint_to_test1, Fingerprint_to_test2])
+    print(preds)
+
+
+if __name__ == "__main__":
+    argc = len(sys.argv)
+    main(argc, sys.argv)
