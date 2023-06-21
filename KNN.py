@@ -49,7 +49,7 @@ def __create_and_train_model(X_train, y_train, X_test, y_test):
     from sklearn.model_selection import KFold
 
     knn = KNeighborsRegressor(n_neighbors=3)
-    kfold = KFold(n_splits=5, shuffle=True)s
+    kfold = KFold(n_splits=5, shuffle=True)
     best_model = None
     best_metric = float('inf')
     for train_index, val_index in kfold.split(X_train):
