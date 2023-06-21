@@ -34,7 +34,6 @@ def __prepare_data(data_train, data_test):
     # Split the data
     X_train = df_train_pivoted.drop(['x', 'y'], axis=1).to_numpy()
     y_train = df_train_pivoted[['x', 'y']].to_numpy()
-
     X_test = df_test_pivoted.drop(['x', 'y'], axis=1).to_numpy()
     y_test = df_test_pivoted[['x', 'y']].to_numpy()
 
@@ -44,7 +43,7 @@ def __prepare_data(data_train, data_test):
     #X_test = codage_one_hot_for_ML(X_test)
     return X_train, y_train, X_test, y_test
 
-def __create_and_train_model(X_train, y_train, X_test, y_test):
+def __create_and_train_model(X_train, y_train):
     #### Modèle et prédiction ####
     from sklearn.model_selection import KFold
 
@@ -54,14 +53,14 @@ def __create_and_train_model(X_train, y_train, X_test, y_test):
     best_metric = float('inf')
     for train_index, val_index in kfold.split(X_train):
         # KNN model & prédiction
-        X_train_fold = X_train.iloc[train_index]
-        y_train_fold = y_train.iloc[train_index]
-        X_val_fold = X_train.iloc[val_index]
-        y_val_fold = y_train.iloc[val_index]
+        X_train_fold = X_train[train_index]
+        y_train_fold = y_train[train_index]
+        X_val_fold = X_train[val_index]
+        y_val_fold = y_train[val_index]
 
-        knn.fit(X_train, y_train)
-        y_pred = estimate_position(knn, X_test)
-        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+        knn.fit(X_train_fold, y_train_fold)
+        y_pred = estimate_position(knn, X_val_fold)
+        rmse = np.sqrt(mean_squared_error(y_val_fold, y_pred))
         if rmse < best_metric:
             best_metric = rmse
             best_model = knn
@@ -69,7 +68,7 @@ def __create_and_train_model(X_train, y_train, X_test, y_test):
     # # KNN model & prédiction
     # knn = KNeighborsRegressor(n_neighbors=3)
     # knn.fit(X_train, y_train)
-    return knn
+    return best_model
 
 def estimate_position(knn, X_test):
     y_pred = knn.predict(X_test)
@@ -194,9 +193,9 @@ def main(argc, argv):
 
 
     #### KNN training #### 
-    """knn = __create_and_train_model(X_train, y_train)
+    knn = __create_and_train_model(X_train, y_train)
     __evaluate_model(knn, X_test, y_test)
-    __save_model(knn, 'model/KNN_model.pkl')"""
+    __save_model(knn, 'model/KNN_model.pkl')
 
 
     #### example ####
