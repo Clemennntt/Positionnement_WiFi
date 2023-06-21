@@ -69,7 +69,7 @@ def __create_and_train_model(X_train, y_train, X_test, y_test):
     # # KNN model & prédiction
     # rf = RandomForestRegressor(n_estimators=100, random_state=42)
     # rf.fit(X_train, y_train)
-    return rf
+    return best_model
 
 def estimate_position(rf, X_test):
     y_pred = rf.predict(X_test)
