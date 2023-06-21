@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.neighbors import KNeighborsRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
@@ -48,8 +48,8 @@ def __create_and_train_model(X_train, y_train, X_test, y_test):
     #### Modèle et prédiction ####
     from sklearn.model_selection import KFold
 
-    knn = KNeighborsRegressor(n_neighbors=3)
-    kfold = KFold(n_splits=5, shuffle=True)s
+    rf = RandomForestRegressor(n_estimators=100, random_state=42)
+    kfold = KFold(n_splits=5, shuffle=True)
     best_model = None
     best_metric = float('inf')
     for train_index, val_index in kfold.split(X_train):
@@ -59,25 +59,25 @@ def __create_and_train_model(X_train, y_train, X_test, y_test):
         X_val_fold = X_train.iloc[val_index]
         y_val_fold = y_train.iloc[val_index]
 
-        knn.fit(X_train, y_train)
-        y_pred = estimate_position(knn, X_test)
+        rf.fit(X_train, y_train)
+        y_pred = estimate_position(rf, X_test)
         rmse = np.sqrt(mean_squared_error(y_test, y_pred))
         if rmse < best_metric:
             best_metric = rmse
-            best_model = knn
+            best_model = rf
 
     # # KNN model & prédiction
-    # knn = KNeighborsRegressor(n_neighbors=3)
-    # knn.fit(X_train, y_train)
-    return knn
+    # rf = RandomForestRegressor(n_estimators=100, random_state=42)
+    # rf.fit(X_train, y_train)
+    return rf
 
-def estimate_position(knn, X_test):
-    y_pred = knn.predict(X_test)
+def estimate_position(rf, X_test):
+    y_pred = rf.predict(X_test)
     return y_pred
 
-def __evaluate_model(knn, X_test, y_test):
+def __evaluate_model(rf, X_test, y_test):
     #### Evaluation ####
-    y_pred = estimate_position(knn, X_test)
+    y_pred = estimate_position(rf, X_test)
 
     # Métriques d'éval
     mae = mean_absolute_error(y_test, y_pred)
@@ -144,21 +144,21 @@ def __evaluate_model(knn, X_test, y_test):
     plt.title('Distribution des résidus (sans la variable z)')
     plt.show()
 
-def __save_model(knn, path):
+def __save_model(rf, path):
     """
     Private methode 
     Save the trained model to file
     """
     with open(path, 'xb') as f:
-        pickle.dump(knn, f)
+        pickle.dump(rf, f)
 
 def load_model(path):
     """
     Load the tree model from source
     """
     with open(path, 'rb') as f:
-        knn = pickle.load(f)
-    return knn
+        rf = pickle.load(f)
+    return rf
 
 
 
@@ -193,14 +193,14 @@ def main(argc, argv):
     test_correlation(data_train_ML)"""
 
 
-    #### KNN training #### 
-    """knn = __create_and_train_model(X_train, y_train)
-    __evaluate_model(knn, X_test, y_test)
-    __save_model(knn, 'model/KNN_model.pkl')"""
+    #### Random Forest training #### 
+    """rf = __create_and_train_model(X_train, y_train)
+    __evaluate_model(rf, X_test, y_test)
+    __save_model(rf, 'model/RF_model.pkl')"""
 
 
     #### example ####
-    knn = load_model('model/KNN_model.pkl')
+    rf = load_model('model/RF_model.pkl')
 
     Fingerprint_to_test0 = X_test[12]
     Fingerprint_to_test1 = X_test[13]
@@ -208,10 +208,10 @@ def main(argc, argv):
     
     print(Fingerprint_to_test0)
 
-    pred = estimate_position(knn, [Fingerprint_to_test0])
+    pred = estimate_position(rf, [Fingerprint_to_test0])
     print(pred)
 
-    preds = estimate_position(knn, [Fingerprint_to_test0, Fingerprint_to_test1, Fingerprint_to_test2])
+    preds = estimate_position(rf, [Fingerprint_to_test0, Fingerprint_to_test1, Fingerprint_to_test2])
     print(preds)
 
 
